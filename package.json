@@ -1,6 +1,6 @@
 {
-  "name": "evm-large-storage",
-  "version": "1.0.0",
+  "name": "git3-evm-large-storage",
+  "version": "1.0.2",
   "main": "index.js",
   "license": "MIT",
   "devDependencies": {

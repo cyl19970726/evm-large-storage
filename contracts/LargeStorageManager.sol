@@ -83,6 +83,36 @@ contract LargeStorageManager {
         }
     }
 
+    function _stakeTokens(bytes32 key, uint256 chunkId) internal view returns (uint256) {
+        // todo: only consider that store file through creating contract
+        uint256 stakeNum = 0;
+
+        while (true) {
+            (uint256 count,bool found) = _chunkStakeTokens(key,chunkId);
+            if (!found) {
+                return stakeNum;
+            }
+            stakeNum += count;
+            chunkId++;
+        }
+
+        return stakeNum;
+    }
+
+    function _chunkStakeTokens(bytes32 key, uint256 chunkId) internal view returns (uint256,bool) {
+
+        bytes32 metadata = keyToMetadata[key][chunkId];
+        if (metadata == bytes32(0)) {
+            return (0, false);
+        } else if (metadata.isInSlot()) {
+            return (0, true);
+        } else {
+            address addr = metadata.bytes32ToAddr();
+            return (addr.balance,true);
+        }
+    
+    }
+
     function _chunkSize(bytes32 key, uint256 chunkId) internal view returns (uint256, bool) {
         bytes32 metadata = keyToMetadata[key][chunkId];
 
