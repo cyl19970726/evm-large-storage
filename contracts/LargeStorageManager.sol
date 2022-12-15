@@ -84,7 +84,7 @@ contract LargeStorageManager {
     }
 
     function _stakeTokens(bytes32 key, uint256 chunkId) internal view returns (uint256) {
-        // todo: only consider that store file through creating contract
+
         uint256 stakeNum = 0;
 
         while (true) {
