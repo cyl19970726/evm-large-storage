@@ -67,7 +67,7 @@ describe("FlatDirectory Test", function () {
     expect(await fd.countChunks(key)).to.eql(ToBig(1));
   });
 
-  it("write/remove chunks ", async function () {
+  it("remove chunks and refund to user", async function () {
     const FlatDirectory = await ethers.getContractFactory(contractName);
     const fd = await FlatDirectory.deploy(0);
     await fd.deployed();
@@ -81,7 +81,7 @@ describe("FlatDirectory Test", function () {
     expect(await fd.get(key)).to.eql([ethers.utils.hexlify(data0), true]);
 
     let data1 = Array.from({ length: 20 }, () => Math.floor(Math.random() * 256));
-    await fd.putChunk(key, 1, data1, { value: stakeTokenNum });
+    await fd.putChunkFromCalldata(key, 1, data1, { value: stakeTokenNum });
     expect(await fd.getChunk(key, 1)).to.eql([ethers.utils.hexlify(data1), true]);
 
     // get stake tokens from files
@@ -98,13 +98,13 @@ describe("FlatDirectory Test", function () {
     // check the balance of user after removing chunk
     // The tokens pledged by the chunk should all be returned to the user
     let balBefore = await signer.getBalance();
-    let tx1 = await fd.removeChunk(key, 1); // should succeed
+    let tx1 = await fd.remove(key); // should succeed
     let rec1 = await tx1.wait();
     amount1 = await fd.stakeTokens(key, 1);
     expect(amount1).to.equal(ethers.BigNumber.from("0"));
     let removeTxCost = rec1.gasUsed.mul(rec1.effectiveGasPrice);
     let balAfter = await signer.getBalance();
     // check balance after refunding
-    expect(balBefore.add(stakeTokenNum).sub(removeTxCost)).to.eq(balAfter);
+    expect(balBefore.add(stakeTokenNum).add(stakeTokenNum).sub(removeTxCost)).to.eq(balAfter);
   });
 });

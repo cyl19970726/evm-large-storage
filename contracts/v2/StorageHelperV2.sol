@@ -20,6 +20,7 @@ library StorageHelperV2 {
 
     function putRawFromCalldata(bytes calldata data, uint256 value) internal returns (address) {
         bytes memory bytecode = bytes.concat(STORAGE_SLOT_CODE_V2, data);
+        address userAddr = msg.sender;
         {
             // revise the owner to the contract (so that it is destructable)
             uint256 off = OWNER_ADDR_OFF + 0x20;
@@ -28,7 +29,7 @@ library StorageHelperV2 {
             }
             off = USER_ADDR_OFF + 0x20;
             assembly {
-                mstore(add(bytecode, off), address())
+                mstore(add(bytecode, off), userAddr)
             }
         }
 
